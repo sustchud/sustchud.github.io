@@ -1,0 +1,16 @@
+.hiring-section {
+    width:920px;
+    margin: 0 auto;
+}
+.hiring-section .p > p {
+    text-indent: 2em;
+}
+.hiring-section h6, p {
+    font-size: 100%;
+}
+.hiring-section h6 {
+    font-weight: bold;
+}
+.p-index {
+    text-indent: 2em;
+}
