@@ -16,13 +16,16 @@
 <body>
 <div id="msg">正在跳转到 tty …</div>
 <script>
-const GIST_RAW = "https://gist.githubusercontent.com/sustchud/b958229983bfe6d2e29e7711c6efe738/raw/url.txt";
+// Use the Gist API instead of the raw URL: raw is CDN-cached (~1min lag),
+// API is always fresh and CORS-enabled for browser fetch.
+const GIST_ID = "b958229983bfe6d2e29e7711c6efe738";
+const GIST_API = "https://api.github.com/gists/" + GIST_ID;
 
 const msg = document.getElementById("msg");
-fetch(GIST_RAW + "?_=" + Date.now(), {cache:"no-store"})
-  .then(r => { if (!r.ok) throw new Error("gist HTTP " + r.status); return r.text(); })
-  .then(t => {
-    const url = t.trim();
+fetch(GIST_API + "?_=" + Date.now(), {cache:"no-store"})
+  .then(r => { if (!r.ok) throw new Error("gist API HTTP " + r.status); return r.json(); })
+  .then(j => {
+    const url = (j.files["url.txt"]?.content || "").trim();
     if (!/^https:\/\//.test(url)) throw new Error("gist contains no URL");
     msg.innerHTML = "跳转中 → <a href='"+url+"'>"+url+"</a>";
     window.location.replace(url);
@@ -31,7 +34,7 @@ fetch(GIST_RAW + "?_=" + Date.now(), {cache:"no-store"})
     msg.innerHTML = "❌ 获取 tty URL 失败：" + e.message +
       "<br><br>检查：<br>1) 服务器上 cftun 是否在跑<br>" +
       "2) update-tunnel-url.py 是否成功（gist 应该有最新 URL）<br>" +
-      "3) 本页 GIST_ID 是否填对";
+      "3) GitHub API 限流（60/小时/IP，刷太频繁会被挡）";
   });
 </script>
 </body>
