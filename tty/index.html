@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>tty — daning server</title>
+<style>
+  html,body{margin:0;padding:0;background:#fdf6e3;color:#586e75;
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+    height:100%;display:flex;align-items:center;justify-content:center;
+    text-align:center}
+  #msg{padding:1.2em}
+  a{color:#268bd2}
+</style>
+</head>
+<body>
+<div id="msg">正在跳转到 tty …</div>
+<script>
+const GIST_RAW = "https://gist.githubusercontent.com/sustchud/b958229983bfe6d2e29e7711c6efe738/raw/url.txt";
+
+const msg = document.getElementById("msg");
+fetch(GIST_RAW + "?_=" + Date.now(), {cache:"no-store"})
+  .then(r => { if (!r.ok) throw new Error("gist HTTP " + r.status); return r.text(); })
+  .then(t => {
+    const url = t.trim();
+    if (!/^https:\/\//.test(url)) throw new Error("gist contains no URL");
+    msg.innerHTML = "跳转中 → <a href='"+url+"'>"+url+"</a>";
+    window.location.replace(url);
+  })
+  .catch(e => {
+    msg.innerHTML = "❌ 获取 tty URL 失败：" + e.message +
+      "<br><br>检查：<br>1) 服务器上 cftun 是否在跑<br>" +
+      "2) update-tunnel-url.py 是否成功（gist 应该有最新 URL）<br>" +
+      "3) 本页 GIST_ID 是否填对";
+  });
+</script>
+</body>
+</html>
